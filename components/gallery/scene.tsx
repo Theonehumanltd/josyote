@@ -73,7 +73,8 @@ function WallPainting({
   texture.anisotropy = 16;
   texture.colorSpace = THREE.SRGBColorSpace;
 
-  const aspect = texture.image ? texture.image.width / texture.image.height : 0.75;
+  const img = texture.image as HTMLImageElement | undefined;
+  const aspect = img ? img.width / img.height : 0.75;
 
   // Fit painting within max 1.8 wide × 2.2 tall
   const maxW = 1.8;
