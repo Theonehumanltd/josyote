@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { works } from "@/data/works";
-import { ArtworkPlaceholder } from "@/components/artwork-placeholder";
+import { ProtectedImage } from "@/components/protected-image";
 
 export const metadata: Metadata = {
   title: "Works",
@@ -34,8 +34,14 @@ export default function WorksPage() {
             href={`/works/${work.slug}`}
             className="group"
           >
-            <div className="overflow-hidden border border-border transition-colors group-hover:border-cream/30">
-              <ArtworkPlaceholder title={work.title} />
+            <div className="relative aspect-[3/4] overflow-hidden border border-border bg-dark-warm transition-colors group-hover:border-cream/30">
+              <ProtectedImage
+                src={work.image}
+                alt={work.title}
+                fill
+                className="object-contain"
+                sizes="(max-width: 640px) 100vw, 50vw"
+              />
             </div>
 
             <div className="mt-4 flex items-start justify-between gap-4">

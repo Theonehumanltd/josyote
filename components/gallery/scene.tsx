@@ -1,157 +1,189 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
+import { OrbitControls, useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import { works } from "@/data/works";
-import { Room, ROOM_W, ROOM_D } from "./room";
-import { Painting } from "./painting";
-import { CameraController } from "./camera-controller";
-import { DustParticles } from "./particles";
 import { GalleryOverlay } from "./gallery-overlay";
 
-// Place paintings around the room walls
-// 2 on each long wall (left / right), evenly spaced
-const PAINTING_Y = 2.0; // eye-level center
-const WALL_OFFSET = 0.06; // distance from wall surface
+// Room dimensions
+const W = 10;
+const H = 4;
+const D = 8;
 
-const paintingPlacements: {
+const WALL_COLOR = "#E8E4DF";
+const FLOOR_COLOR = "#C4BEB6";
+const CEILING_COLOR = "#F5F3F0";
+
+function GalleryRoom() {
+  return (
+    <group>
+      {/* Floor */}
+      <mesh rotation-x={-Math.PI / 2} receiveShadow>
+        <planeGeometry args={[W, D]} />
+        <meshStandardMaterial color={FLOOR_COLOR} roughness={0.9} />
+      </mesh>
+      {/* Ceiling */}
+      <mesh rotation-x={Math.PI / 2} position-y={H}>
+        <planeGeometry args={[W, D]} />
+        <meshStandardMaterial color={CEILING_COLOR} roughness={1} />
+      </mesh>
+      {/* Back wall */}
+      <mesh position={[0, H / 2, -D / 2]}>
+        <planeGeometry args={[W, H]} />
+        <meshStandardMaterial color={WALL_COLOR} roughness={0.85} />
+      </mesh>
+      {/* Front wall */}
+      <mesh position={[0, H / 2, D / 2]} rotation-y={Math.PI}>
+        <planeGeometry args={[W, H]} />
+        <meshStandardMaterial color={WALL_COLOR} roughness={0.85} />
+      </mesh>
+      {/* Left wall */}
+      <mesh position={[-W / 2, H / 2, 0]} rotation-y={Math.PI / 2}>
+        <planeGeometry args={[D, H]} />
+        <meshStandardMaterial color={WALL_COLOR} roughness={0.85} />
+      </mesh>
+      {/* Right wall */}
+      <mesh position={[W / 2, H / 2, 0]} rotation-y={-Math.PI / 2}>
+        <planeGeometry args={[D, H]} />
+        <meshStandardMaterial color={WALL_COLOR} roughness={0.85} />
+      </mesh>
+    </group>
+  );
+}
+
+function WallPainting({
+  imageSrc,
+  position,
+  rotation,
+  onClick,
+}: {
+  imageSrc: string;
   position: [number, number, number];
   rotation: [number, number, number];
-}[] = [
-  // Left wall — facing right (+x direction)
-  {
-    position: [-ROOM_W / 2 + WALL_OFFSET, PAINTING_Y, -ROOM_D / 4],
-    rotation: [0, Math.PI / 2, 0],
-  },
-  {
-    position: [-ROOM_W / 2 + WALL_OFFSET, PAINTING_Y, ROOM_D / 4],
-    rotation: [0, Math.PI / 2, 0],
-  },
-  // Right wall — facing left (-x direction)
-  {
-    position: [ROOM_W / 2 - WALL_OFFSET, PAINTING_Y, -ROOM_D / 4],
-    rotation: [0, -Math.PI / 2, 0],
-  },
-  {
-    position: [ROOM_W / 2 - WALL_OFFSET, PAINTING_Y, ROOM_D / 4],
-    rotation: [0, -Math.PI / 2, 0],
-  },
-];
+  onClick: () => void;
+}) {
+  const texture = useTexture(imageSrc);
 
-// Camera positions for viewing each painting (stand in front, facing the wall)
-const viewPositions = paintingPlacements.map(({ position, rotation }) => {
-  const standDistance = 2.5;
-  const dir = new THREE.Vector3(0, 0, 1).applyEuler(
-    new THREE.Euler(...rotation)
+  // Better texture filtering to reduce pixelation
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.generateMipmaps = true;
+  texture.anisotropy = 16;
+  texture.colorSpace = THREE.SRGBColorSpace;
+
+  const aspect = texture.image ? texture.image.width / texture.image.height : 0.75;
+
+  // Fit painting within max 1.8 wide × 2.2 tall
+  const maxW = 1.8;
+  const maxH = 2.2;
+  let pw: number, ph: number;
+  if (aspect > maxW / maxH) {
+    pw = maxW;
+    ph = maxW / aspect;
+  } else {
+    ph = maxH;
+    pw = maxH * aspect;
+  }
+
+  const frameBorder = 0.08;
+
+  return (
+    <group position={position} rotation={rotation}>
+      {/* Dark frame */}
+      <mesh position={[0, 0, -0.03]}>
+        <boxGeometry args={[pw + frameBorder * 2, ph + frameBorder * 2, 0.06]} />
+        <meshStandardMaterial color="#1A1510" roughness={0.4} metalness={0.2} />
+      </mesh>
+      {/* The painting — sits clearly in front of frame */}
+      <mesh position={[0, 0, 0.02]} onClick={(e) => { e.stopPropagation(); onClick(); }}>
+        <planeGeometry args={[pw, ph]} />
+        <meshStandardMaterial map={texture} roughness={0.7} />
+      </mesh>
+    </group>
   );
-  return {
-    camera: new THREE.Vector3(
-      position[0] + dir.x * standDistance,
-      1.6, // eye height
-      position[2] + dir.z * standDistance
-    ),
-    lookAt: new THREE.Vector3(...position),
-  };
-});
+}
+
+// Painting positions: 2 per side wall
+const paintingData = [
+  // Left wall
+  { pos: [-W / 2 + 0.06, 1.8, -1.3] as [number, number, number], rot: [0, Math.PI / 2, 0] as [number, number, number] },
+  { pos: [-W / 2 + 0.06, 1.8, 1.3] as [number, number, number], rot: [0, Math.PI / 2, 0] as [number, number, number] },
+  // Right wall
+  { pos: [W / 2 - 0.06, 1.8, -1.3] as [number, number, number], rot: [0, -Math.PI / 2, 0] as [number, number, number] },
+  { pos: [W / 2 - 0.06, 1.8, 1.3] as [number, number, number], rot: [0, -Math.PI / 2, 0] as [number, number, number] },
+];
 
 export function GalleryScene() {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [cameraTarget, setCameraTarget] = useState<THREE.Vector3 | null>(null);
-  const [cameraLookAt, setCameraLookAt] = useState<THREE.Vector3 | null>(null);
-
   const selectedWork = selectedIndex !== null ? works[selectedIndex] : null;
 
-  const goTo = useCallback((index: number) => {
-    setSelectedIndex(index);
-    setCameraTarget(viewPositions[index].camera);
-    setCameraLookAt(viewPositions[index].lookAt);
-  }, []);
-
-  const clearSelection = useCallback(() => {
-    setSelectedIndex(null);
-    setCameraTarget(null);
-    setCameraLookAt(null);
-  }, []);
-
+  const goTo = useCallback((i: number) => setSelectedIndex(i), []);
+  const clearSelection = useCallback(() => setSelectedIndex(null), []);
   const goPrev = useCallback(() => {
-    if (selectedIndex === null) {
-      goTo(0);
-    } else if (selectedIndex > 0) {
-      goTo(selectedIndex - 1);
-    }
-  }, [selectedIndex, goTo]);
-
+    setSelectedIndex((prev) => (prev === null ? 0 : Math.max(0, prev - 1)));
+  }, []);
   const goNext = useCallback(() => {
-    if (selectedIndex === null) {
-      goTo(0);
-    } else if (selectedIndex < works.length - 1) {
-      goTo(selectedIndex + 1);
-    }
-  }, [selectedIndex, goTo]);
-
-  const initialCamera = useMemo(
-    () => ({
-      position: [0, 1.6, 3] as [number, number, number],
-      fov: 60,
-    }),
-    []
-  );
+    setSelectedIndex((prev) =>
+      prev === null ? 0 : Math.min(works.length - 1, prev + 1)
+    );
+  }, []);
 
   return (
     <div className="relative h-full w-full">
       <Canvas
         dpr={[1, 2]}
-        camera={{
-          position: initialCamera.position,
-          fov: initialCamera.fov,
-          near: 0.1,
-          far: 50,
+        camera={{ position: [0, 1.6, 0], fov: 70, near: 0.01, far: 30 }}
+        gl={{
+          antialias: true,
+          toneMapping: THREE.ACESFilmicToneMapping,
+          toneMappingExposure: 1.0,
+          logarithmicDepthBuffer: true,
         }}
-        gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}
-        style={{ background: "#0E0D0B" }}
+        style={{ background: "#F5F3F0" }}
       >
-        {/* Ambient base */}
-        <ambientLight intensity={0.15} color="#F2EBDD" />
+        {/* Lighting — bright gallery feel */}
+        <ambientLight intensity={1.0} color="#ffffff" />
+        <pointLight position={[0, 3.5, 0]} intensity={2} distance={12} color="#ffffff" />
+        <pointLight position={[-3, 3, -1.3]} intensity={1.5} distance={6} color="#F5E6C8" />
+        <pointLight position={[-3, 3, 1.3]} intensity={1.5} distance={6} color="#F5E6C8" />
+        <pointLight position={[3, 3, -1.3]} intensity={1.5} distance={6} color="#F5E6C8" />
+        <pointLight position={[3, 3, 1.3]} intensity={1.5} distance={6} color="#F5E6C8" />
 
-        {/* Warm spot lights above each painting */}
-        {paintingPlacements.map(({ position }, i) => (
-          <pointLight
-            key={i}
-            position={[position[0], 3.8, position[2]]}
-            intensity={1.2}
-            distance={5}
-            decay={2}
-            color="#F5E6C8"
-          />
-        ))}
+        <GalleryRoom />
 
-        <Room />
+        <Suspense fallback={null}>
+          {works.map((work, i) => (
+            <WallPainting
+              key={work.slug}
+              imageSrc={work.image}
+              position={paintingData[i].pos}
+              rotation={paintingData[i].rot}
+              onClick={() => goTo(i)}
+            />
+          ))}
+        </Suspense>
 
-        {works.map((work, i) => (
-          <Painting
-            key={work.slug}
-            work={work}
-            position={paintingPlacements[i].position}
-            rotation={paintingPlacements[i].rotation}
-            onClick={() => goTo(i)}
-          />
-        ))}
-
-        <DustParticles />
-
-        <CameraController
-          target={cameraTarget}
-          lookAt={cameraLookAt}
-          onArrived={() => {}}
+        {/* Orbit controls — drag to look, scroll to zoom/walk */}
+        <OrbitControls
+          target={[0, 1.6, 0]}
+          enableZoom={true}
+          enablePan={false}
+          minDistance={0.5}
+          maxDistance={4.5}
+          minPolarAngle={Math.PI / 4}
+          maxPolarAngle={Math.PI / 1.5}
+          rotateSpeed={0.5}
+          zoomSpeed={0.8}
+          makeDefault
         />
       </Canvas>
 
-      {/* Instruction hint */}
       {selectedIndex === null && (
         <div className="absolute left-1/2 top-6 -translate-x-1/2 text-center">
-          <p className="text-xs uppercase tracking-[0.2em] text-cream/40">
-            Drag to look around &middot; Click a painting to view
+          <p className="text-xs uppercase tracking-[0.2em] text-neutral-500">
+            Drag to look around &middot; Scroll to zoom &middot; Click a painting to view
           </p>
         </div>
       )}
@@ -162,9 +194,7 @@ export function GalleryScene() {
         onPrev={goPrev}
         onNext={goNext}
         hasPrev={selectedIndex !== null && selectedIndex > 0}
-        hasNext={
-          selectedIndex !== null && selectedIndex < works.length - 1
-        }
+        hasNext={selectedIndex !== null && selectedIndex < works.length - 1}
       />
     </div>
   );

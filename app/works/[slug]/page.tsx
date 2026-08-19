@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { works } from "@/data/works";
-import { ArtworkPlaceholder } from "@/components/artwork-placeholder";
+import { ProtectedImage } from "@/components/protected-image";
 
 export function generateStaticParams() {
   return works.map((work) => ({ slug: work.slug }));
@@ -55,8 +55,15 @@ export default async function WorkPage({
 
       <div className="mt-10 grid gap-12 lg:grid-cols-2 lg:gap-20">
         {/* Image */}
-        <div className="border border-border">
-          <ArtworkPlaceholder title={work.title} />
+        <div className="relative aspect-[3/4] border border-border bg-dark-warm">
+          <ProtectedImage
+            src={work.image}
+            alt={work.title}
+            fill
+            className="object-contain"
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            priority
+          />
         </div>
 
         {/* Details */}

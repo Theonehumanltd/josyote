@@ -18,7 +18,8 @@ export function CameraController({
   const { camera, gl } = useThree();
   const isDragging = useRef(false);
   const previousMouse = useRef({ x: 0, y: 0 });
-  const spherical = useRef(new THREE.Spherical(1, Math.PI / 2, 0));
+  // Start looking toward left wall (-x direction): theta = PI/2
+  const spherical = useRef(new THREE.Spherical(1, Math.PI / 2, Math.PI / 2));
   const animating = useRef(false);
   const arrived = useRef(false);
   const prefersReducedMotion = useRef(false);

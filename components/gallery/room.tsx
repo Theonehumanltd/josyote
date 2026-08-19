@@ -3,13 +3,13 @@
 import { useMemo } from "react";
 import * as THREE from "three";
 
-const ROOM_W = 14;
-const ROOM_H = 4.5;
-const ROOM_D = 10;
+const ROOM_W = 8;
+const ROOM_H = 4;
+const ROOM_D = 6;
 
-const wallColor = "#0E0D0B";
+const wallColor = "#1A1714";
 const floorColor = "#2A1F14";
-const ceilingColor = "#0A0908";
+const ceilingColor = "#0E0D0B";
 
 export function Room() {
   const floorTexture = useMemo(() => {
@@ -18,11 +18,9 @@ export function Room() {
     canvas.height = 512;
     const ctx = canvas.getContext("2d")!;
 
-    // Wood grain base
     ctx.fillStyle = floorColor;
     ctx.fillRect(0, 0, 512, 512);
 
-    // Plank lines
     ctx.strokeStyle = "rgba(0,0,0,0.3)";
     ctx.lineWidth = 2;
     for (let i = 0; i < 8; i++) {
@@ -33,7 +31,6 @@ export function Room() {
       ctx.stroke();
     }
 
-    // Subtle grain
     for (let i = 0; i < 2000; i++) {
       const x = Math.random() * 512;
       const y = Math.random() * 512;
@@ -68,28 +65,19 @@ export function Room() {
       </mesh>
 
       {/* Front wall */}
-      <mesh
-        position={[0, ROOM_H / 2, ROOM_D / 2]}
-        rotation-y={Math.PI}
-      >
+      <mesh position={[0, ROOM_H / 2, ROOM_D / 2]} rotation-y={Math.PI}>
         <planeGeometry args={[ROOM_W, ROOM_H]} />
         <meshStandardMaterial color={wallColor} roughness={0.9} />
       </mesh>
 
       {/* Left wall */}
-      <mesh
-        position={[-ROOM_W / 2, ROOM_H / 2, 0]}
-        rotation-y={Math.PI / 2}
-      >
+      <mesh position={[-ROOM_W / 2, ROOM_H / 2, 0]} rotation-y={Math.PI / 2}>
         <planeGeometry args={[ROOM_D, ROOM_H]} />
         <meshStandardMaterial color={wallColor} roughness={0.9} />
       </mesh>
 
       {/* Right wall */}
-      <mesh
-        position={[ROOM_W / 2, ROOM_H / 2, 0]}
-        rotation-y={-Math.PI / 2}
-      >
+      <mesh position={[ROOM_W / 2, ROOM_H / 2, 0]} rotation-y={-Math.PI / 2}>
         <planeGeometry args={[ROOM_D, ROOM_H]} />
         <meshStandardMaterial color={wallColor} roughness={0.9} />
       </mesh>
