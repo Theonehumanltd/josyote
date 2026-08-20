@@ -1,3 +1,8 @@
+export interface MediaItem {
+  type: "image" | "video";
+  src: string;
+}
+
 export interface Work {
   slug: string;
   title: string;
@@ -7,7 +12,8 @@ export interface Work {
   price: number | null;
   printsAvailable: boolean;
   description: string;
-  image: string;
+  image: string; // primary image (used for thumbnails, gallery, OG)
+  media: MediaItem[]; // all media for the detail carousel
 }
 
 export const works: Work[] = [
@@ -22,6 +28,10 @@ export const works: Work[] = [
     description:
       "A meditation on surrender — the moment before you let go and trust the fall.",
     image: "/images/when-we-fall.jpg",
+    media: [
+      { type: "image", src: "/images/when-we-fall.jpg" },
+      { type: "video", src: "/videos/when-we-fall.mp4" },
+    ],
   },
   {
     slug: "through-the-noise",
@@ -34,6 +44,10 @@ export const works: Work[] = [
     description:
       "Finding stillness inside the chaos. Layers of texture break through the surface.",
     image: "/images/through-the-noise.jpg",
+    media: [
+      { type: "image", src: "/images/through-the-noise.jpg" },
+      { type: "video", src: "/videos/through-the-noise.mp4" },
+    ],
   },
   {
     slug: "stay",
@@ -46,6 +60,10 @@ export const works: Work[] = [
     description:
       "A quiet plea — to be present, to remain, to not look away.",
     image: "/images/stay.jpg",
+    media: [
+      { type: "image", src: "/images/stay.jpg" },
+      { type: "video", src: "/videos/stay.mp4" },
+    ],
   },
   {
     slug: "one-body",
@@ -58,5 +76,9 @@ export const works: Work[] = [
     description:
       "We are many, but we move as one. Shared breath, shared weight.",
     image: "/images/one-body.jpg",
+    media: [
+      { type: "image", src: "/images/one-body.jpg" },
+      { type: "video", src: "/videos/one-body.mp4" },
+    ],
   },
 ];

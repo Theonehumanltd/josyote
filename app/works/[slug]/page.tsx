@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { works } from "@/data/works";
-import { ProtectedImage } from "@/components/protected-image";
+import { MediaCarousel } from "@/components/media-carousel";
 
 export function generateStaticParams() {
   return works.map((work) => ({ slug: work.slug }));
@@ -54,13 +54,11 @@ export default async function WorkPage({
       </Link>
 
       <div className="mt-10 grid gap-12 lg:grid-cols-2 lg:gap-20">
-        {/* Image */}
-        <div className="relative aspect-[3/4] border border-border bg-dark-warm">
-          <ProtectedImage
-            src={work.image}
+        {/* Media carousel */}
+        <div className="border border-border">
+          <MediaCarousel
+            media={work.media}
             alt={work.title}
-            fill
-            className="object-contain"
             sizes="(max-width: 1024px) 100vw, 50vw"
             priority
           />
