@@ -47,6 +47,12 @@ export function Footer() {
           >
             Refunds &amp; Cancellations
           </Link>
+          <Link
+            href="/contact"
+            className="text-[11px] uppercase tracking-[0.15em] text-cream/30 transition-colors hover:text-cream/60"
+          >
+            Contact
+          </Link>
         </div>
 
         <p className="mt-4 text-center text-[10px] text-cream/20 sm:text-left">

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { works } from "@/data/works";
 import { MediaCarousel } from "@/components/media-carousel";
+import { ContactForm } from "@/components/contact-form";
 
 export function generateStaticParams() {
   return works.map((work) => ({ slug: work.slug }));
@@ -94,12 +95,9 @@ export default async function WorkPage({
                 <p className="font-display text-3xl">
                   {formatPrice(work.price)}
                 </p>
-                <a
-                  href={`mailto:hello@josyote.com?subject=Enquiry: ${work.title}`}
-                  className="mt-6 inline-block border border-cream/80 px-8 py-3 text-xs uppercase tracking-[0.2em] transition-colors hover:bg-cream hover:text-dark"
-                >
-                  Enquire
-                </a>
+                <div className="mt-6">
+                  <ContactForm subject={work.title} />
+                </div>
               </>
             ) : (
               <p className="text-sm text-cream/50">

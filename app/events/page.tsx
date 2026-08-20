@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { EventCountdown } from "@/components/event-countdown";
+import { NotifyForm } from "@/components/notify-form";
 
 export const metadata: Metadata = {
   title: "Events — Hosted by Josy",
@@ -67,23 +68,7 @@ export default function EventsPage() {
               Get notified when new events are announced. No spam, just
               invitations.
             </p>
-            <form
-              action="https://instagram.com/hostedbyjosy"
-              target="_blank"
-              className="flex gap-3"
-            >
-              <input
-                type="email"
-                placeholder="Your email"
-                className="flex-1 border border-border bg-transparent px-4 py-3 text-sm text-cream placeholder:text-cream/30 focus:border-cream/40 focus:outline-none"
-              />
-              <button
-                type="submit"
-                className="shrink-0 border border-cream/80 px-6 py-3 text-xs uppercase tracking-[0.2em] transition-colors hover:bg-cream hover:text-dark"
-              >
-                Notify me
-              </button>
-            </form>
+            <NotifyForm />
           </div>
 
           {/* Follow */}
