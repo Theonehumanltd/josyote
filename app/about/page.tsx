@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "About",
@@ -19,11 +20,16 @@ export default function AboutPage() {
       </header>
 
       <div className="grid gap-16 lg:grid-cols-[1fr_1.2fr] lg:gap-24">
-        {/* Portrait placeholder */}
-        <div className="flex aspect-[3/4] items-center justify-center border border-border bg-dark-warm">
-          <span className="font-display text-sm italic text-cream/20">
-            Portrait
-          </span>
+        {/* Portrait */}
+        <div className="relative aspect-[3/4] overflow-hidden">
+          <Image
+            src="/images/Portrait.jpg"
+            alt="Josy Ote portrait"
+            fill
+            className="object-cover"
+            sizes="(max-width: 1024px) 100vw, 45vw"
+            priority
+          />
         </div>
 
         {/* Bio */}

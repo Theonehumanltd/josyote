@@ -13,8 +13,9 @@ export default function Home() {
         </h1>
 
         <p className="max-w-md text-lg leading-relaxed text-cream/70">
-          Acrylic, oil pastel, ink and modelling paste. Exploring faith, inner
-          peace and the things we share.
+          Seven years painting in private. Now on the wall.
+          <br />
+          Work about the thoughts you don&rsquo;t say out loud.
         </p>
 
         <div className="flex flex-col gap-4 sm:flex-row">

@@ -22,8 +22,8 @@ export const works: Work[] = [
     title: "When We Fall",
     year: 2025,
     medium: "Acrylic, oil pastel & ink on canvas",
-    dimensions: "100 × 80 cm",
-    price: null,
+    dimensions: "80 × 100 cm",
+    price: 4000,
     printsAvailable: true,
     description:
       "A meditation on surrender — the moment before you let go and trust the fall.",
@@ -38,11 +38,11 @@ export const works: Work[] = [
     title: "Through the Noise",
     year: 2026,
     medium: "Acrylic, modelling paste & oil pastel on canvas",
-    dimensions: "120 × 90 cm",
-    price: 5699.99,
+    dimensions: "80 × 120 cm",
+    price: 5300,
     printsAvailable: false,
     description:
-      "Finding stillness inside the chaos. Layers of texture break through the surface.",
+      "A quiet plea — to be present, to remain, to not look away.",
     image: "/images/through-the-noise.jpg",
     media: [
       { type: "image", src: "/images/through-the-noise.jpg" },
@@ -54,11 +54,11 @@ export const works: Work[] = [
     title: "Stay",
     year: 2026,
     medium: "Acrylic & oil pastel on canvas",
-    dimensions: "100 × 80 cm",
-    price: 5000,
+    dimensions: "80 × 120 cm",
+    price: 5600,
     printsAvailable: false,
     description:
-      "A quiet plea — to be present, to remain, to not look away.",
+      "Finding stillness inside the chaos. Layers of texture break through the surface.",
     image: "/images/stay.jpg",
     media: [
       { type: "image", src: "/images/stay.jpg" },
@@ -69,9 +69,9 @@ export const works: Work[] = [
     slug: "one-body",
     title: "One Body",
     year: 2026,
-    medium: "Acrylic, ink & modelling paste on canvas",
-    dimensions: "120 × 90 cm",
-    price: 4500,
+    medium: "Acrylic, ink & oil pastel on canvas",
+    dimensions: "80 × 100 cm",
+    price: 3500,
     printsAvailable: false,
     description:
       "We are many, but we move as one. Shared breath, shared weight.",
