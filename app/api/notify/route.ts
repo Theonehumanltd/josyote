@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let _resend: Resend | null = null;
+function getResend() {
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY);
+  return _resend;
+}
 
 const recentRequests = new Map<string, number[]>();
 
@@ -67,7 +71,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { error } = await resend.contacts.create({
+    const { error } = await getResend().contacts.create({
       email: email.trim(),
       unsubscribed: false,
     });
