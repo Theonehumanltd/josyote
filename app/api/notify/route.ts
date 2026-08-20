@@ -71,10 +71,12 @@ export async function POST(request: Request) {
       );
     }
 
-    const { error } = await getResend().contacts.create({
+    const { data, error } = await getResend().contacts.create({
       email: email.trim(),
       unsubscribed: false,
     });
+
+    console.log("Resend contacts.create result:", { data, error });
 
     // Treat duplicate/conflict as success
     if (error) {
@@ -89,7 +91,7 @@ export async function POST(request: Request) {
         msg.toLowerCase().includes("exist");
 
       if (!isDuplicate) {
-        console.error("Resend error:", error);
+        console.error("Resend error:", JSON.stringify(error));
         return NextResponse.json(
           {
             error:
