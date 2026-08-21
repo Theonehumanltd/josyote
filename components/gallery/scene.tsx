@@ -76,9 +76,9 @@ function WallPainting({
   const img = texture.image as HTMLImageElement | undefined;
   const aspect = img ? img.width / img.height : 0.75;
 
-  // Fit painting within max 1.8 wide × 2.2 tall
-  const maxW = 1.8;
-  const maxH = 2.2;
+  // Fit painting within max bounds — taller paintings get more height
+  const maxW = 2.0;
+  const maxH = 2.6;
   let pw: number, ph: number;
   if (aspect > maxW / maxH) {
     pw = maxW;
