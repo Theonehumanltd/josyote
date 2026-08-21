@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 const navLinks = [
   { href: "/works", label: "Works" },
@@ -11,11 +12,14 @@ export function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-dark/80 backdrop-blur-md">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-        <Link
-          href="/"
-          className="font-display text-xl tracking-wide text-cream"
-        >
-          Josy Ote
+        <Link href="/" className="block">
+          <Image
+            src="/images/logo.png"
+            alt="Josy Ote"
+            width={32}
+            height={40}
+            className="invert"
+          />
         </Link>
 
         <ul className="flex gap-8">
