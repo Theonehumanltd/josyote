@@ -5,7 +5,7 @@ import { NotifyForm } from "@/components/notify-form";
 export const metadata: Metadata = {
   title: "Events — Hosted by Josy",
   description:
-    "Hosted by Josy — curated art events, exhibitions and gatherings in Manchester and beyond. Next event: 11 September 2026.",
+    "Hosted by Josy — curated art events, exhibitions and gatherings in Manchester and beyond. Next event: 17 October 2026.",
 };
 
 export default function EventsPage() {
@@ -29,11 +29,11 @@ export default function EventsPage() {
       {/* Countdown */}
       <section className="mb-20 border border-border p-10 sm:p-16">
         <EventCountdown
-          targetDate="2026-09-11T19:00:00"
+          targetDate="2026-10-17T19:00:00"
           eventName="Different Parts, Vol. II"
         />
         <p className="mt-8 text-center text-sm text-cream/50">
-          11 September 2026 &middot; Manchester
+          17 October 2026 &middot; Manchester
         </p>
       </section>
 
