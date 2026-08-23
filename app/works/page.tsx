@@ -1,21 +1,12 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { works } from "@/data/works";
-import { ProtectedImage } from "@/components/protected-image";
+import { WorkCard } from "@/components/work-card";
 
 export const metadata: Metadata = {
   title: "Works",
   description:
     "Original mixed media artworks by Josy Ote. Acrylic, oil pastel, ink and modelling paste on canvas.",
 };
-
-function formatPrice(price: number) {
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency: "GBP",
-    minimumFractionDigits: price % 1 === 0 ? 0 : 2,
-  }).format(price);
-}
 
 export default function WorksPage() {
   return (
@@ -29,36 +20,7 @@ export default function WorksPage() {
 
       <div className="grid gap-x-8 gap-y-16 sm:grid-cols-2">
         {works.map((work) => (
-          <Link
-            key={work.slug}
-            href={`/works/${work.slug}`}
-            className="group"
-          >
-            <div className="relative aspect-[3/4] overflow-hidden border border-border bg-dark-warm transition-colors group-hover:border-cream/30">
-              <ProtectedImage
-                src={work.image}
-                alt={work.title}
-                fill
-                className="object-contain"
-                sizes="(max-width: 640px) 100vw, 50vw"
-              />
-            </div>
-
-            <div className="mt-4 flex items-start justify-between gap-4">
-              <div>
-                <h2 className="font-display text-xl italic transition-colors group-hover:text-cream">
-                  {work.title}
-                </h2>
-                <p className="mt-1 text-sm text-cream/50">
-                  {work.medium}, {work.year}
-                </p>
-              </div>
-
-              <p className="shrink-0 text-sm text-cream/70">
-                {work.price ? formatPrice(work.price) : "Prints available"}
-              </p>
-            </div>
-          </Link>
+          <WorkCard key={work.slug} work={work} />
         ))}
       </div>
     </div>
