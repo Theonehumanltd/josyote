@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-cream: #F2EBDD;
-  --color-dark: #0E0D0B;
-  --color-dark-warm: #171512;
+  --color-cream: #1A1A1A;
+  --color-dark: #FFFFFF;
+  --color-dark-warm: #F5F3F0;
   --color-red: #B3282D;
-  --color-border: rgba(242, 235, 221, 0.18);
+  --color-border: rgba(26, 26, 26, 0.12);
 
   --font-display: var(--font-playfair-display);
   --font-body: var(--font-inter);

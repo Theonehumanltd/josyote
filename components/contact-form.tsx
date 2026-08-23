@@ -115,7 +115,7 @@ export function ContactForm({
             What is this about?
           </option>
           {ENQUIRY_TYPES.map((type) => (
-            <option key={type} value={type} className="bg-dark text-cream">
+            <option key={type} value={type}>
               {type}
             </option>
           ))}

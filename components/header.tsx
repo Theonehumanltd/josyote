@@ -18,7 +18,7 @@ export function Header() {
             alt="Josy Ote"
             width={32}
             height={40}
-            className="invert"
+            className=""
           />
         </Link>
 

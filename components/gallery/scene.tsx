@@ -135,14 +135,14 @@ export function GalleryScene() {
     <div className="relative h-full w-full">
       <Canvas
         dpr={[1, 2]}
-        camera={{ position: [0, 1.6, 0], fov: 70, near: 0.01, far: 30 }}
+        camera={{ position: [2, 1.6, 0], fov: 70, near: 0.01, far: 30 }}
         gl={{
           antialias: true,
           toneMapping: THREE.ACESFilmicToneMapping,
           toneMappingExposure: 1.0,
           logarithmicDepthBuffer: true,
         }}
-        style={{ background: "#F5F3F0" }}
+        style={{ background: "#FFFFFF" }}
       >
         {/* Lighting — bright gallery feel */}
         <ambientLight intensity={1.0} color="#ffffff" />
@@ -168,7 +168,7 @@ export function GalleryScene() {
 
         {/* Orbit controls — drag to look, scroll to zoom/walk */}
         <OrbitControls
-          target={[0, 1.6, 0]}
+          target={[-2, 1.6, 0]}
           enableZoom={true}
           enablePan={false}
           minDistance={0.5}
