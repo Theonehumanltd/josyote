@@ -4,7 +4,7 @@ import Image from "next/image";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Josy Ote (Josiah Otto Ephraim) is a Manchester-based mixed media artist working with acrylic, oil pastel, ink and modelling paste.",
+    "Josy Ote is a Manchester-based mixed media artist working with acrylic, oil pastel, ink and modelling paste.",
 };
 
 export default function AboutPage() {
@@ -36,8 +36,7 @@ export default function AboutPage() {
         <div className="flex flex-col gap-8">
           <div className="space-y-6 text-lg leading-relaxed text-cream/80">
             <p>
-              Josiah Otto Ephraim &mdash; Josy Ote &mdash; is a mixed media
-              artist based in Manchester, UK. His work moves across acrylic, oil
+              Josy Ote is a mixed media artist based in Manchester, UK. His work moves across acrylic, oil
               pastel, ink and modelling paste, building layered surfaces that
               hold weight and quiet at the same time.
             </p>
