@@ -168,7 +168,7 @@ export function GalleryScene() {
 
         {/* Orbit controls — drag to look, scroll to zoom/walk */}
         <OrbitControls
-          target={[-2, 1.6, 0]}
+          target={[0, 1.6, 0]}
           enableZoom={true}
           enablePan={false}
           minDistance={0.5}
