@@ -73,6 +73,7 @@ export async function POST(request: Request) {
 
     const { data, error } = await getResend().contacts.create({
       email: email.trim(),
+      audienceId: process.env.RESEND_AUDIENCE_ID!,
       unsubscribed: false,
     });
 
