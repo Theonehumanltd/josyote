@@ -2,10 +2,21 @@
 
 import { useState, useCallback, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, useTexture } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import { works } from "@/data/works";
 import { GalleryOverlay } from "./gallery-overlay";
+
+// Placeholder texture for failed loads — 1x1 neutral pixel
+function createFallbackTexture() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 1;
+  canvas.height = 1;
+  const ctx = canvas.getContext("2d")!;
+  ctx.fillStyle = "#3a3a3a";
+  ctx.fillRect(0, 0, 1, 1);
+  return new THREE.CanvasTexture(canvas);
+}
 
 // Room dimensions
 const W = 10;
@@ -64,17 +75,33 @@ function WallPainting({
   rotation: [number, number, number];
   onClick: () => void;
 }) {
-  const texture = useTexture(imageSrc);
+  const [texture, setTexture] = useState<THREE.Texture | null>(null);
+  const [failed, setFailed] = useState(false);
 
-  // Better texture filtering to reduce pixelation
-  texture.minFilter = THREE.LinearMipmapLinearFilter;
-  texture.magFilter = THREE.LinearFilter;
-  texture.generateMipmaps = true;
-  texture.anisotropy = 16;
-  texture.colorSpace = THREE.SRGBColorSpace;
+  useState(() => {
+    const loader = new THREE.TextureLoader();
+    loader.load(
+      imageSrc,
+      (tex) => {
+        tex.minFilter = THREE.LinearMipmapLinearFilter;
+        tex.magFilter = THREE.LinearFilter;
+        tex.generateMipmaps = true;
+        tex.anisotropy = 16;
+        tex.colorSpace = THREE.SRGBColorSpace;
+        setTexture(tex);
+      },
+      undefined,
+      (err) => {
+        console.warn("Failed to load texture:", imageSrc, err);
+        setTexture(createFallbackTexture());
+        setFailed(true);
+      }
+    );
+  });
 
-  const img = texture.image as HTMLImageElement | undefined;
-  const aspect = img ? img.width / img.height : 0.75;
+  const displayTexture = texture;
+  const img = displayTexture?.image as HTMLImageElement | HTMLCanvasElement | undefined;
+  const aspect = img && "width" in img && img.width > 1 ? img.width / img.height : 0.75;
 
   // Fit painting within max bounds — taller paintings get more height
   const maxW = 2.0;
@@ -100,7 +127,11 @@ function WallPainting({
       {/* The painting — sits clearly in front of frame */}
       <mesh position={[0, 0, 0.02]} onClick={(e) => { e.stopPropagation(); onClick(); }}>
         <planeGeometry args={[pw, ph]} />
-        <meshStandardMaterial map={texture} roughness={0.7} />
+        <meshStandardMaterial
+          map={displayTexture}
+          color={failed ? "#3a3a3a" : undefined}
+          roughness={0.7}
+        />
       </mesh>
     </group>
   );
@@ -118,6 +149,7 @@ const paintingData = [
 
 export function GalleryScene() {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [contextLost, setContextLost] = useState(false);
   const selectedWork = selectedIndex !== null ? works[selectedIndex] : null;
 
   const goTo = useCallback((i: number) => setSelectedIndex(i), []);
@@ -131,6 +163,31 @@ export function GalleryScene() {
     );
   }, []);
 
+  const handleCreated = useCallback(({ gl }: { gl: THREE.WebGLRenderer }) => {
+    const canvas = gl.domElement;
+    canvas.addEventListener("webglcontextlost", (e) => {
+      e.preventDefault();
+      setContextLost(true);
+    });
+    canvas.addEventListener("webglcontextrestored", () => {
+      setContextLost(false);
+    });
+  }, []);
+
+  if (contextLost) {
+    return (
+      <div className="flex h-full w-full flex-col items-center justify-center gap-4 text-neutral-500">
+        <p className="text-sm">The 3D gallery lost its rendering context.</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="rounded border border-neutral-300 px-4 py-2 text-sm hover:bg-neutral-100"
+        >
+          Reload page
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="relative h-full w-full">
       <Canvas
@@ -142,6 +199,7 @@ export function GalleryScene() {
           toneMappingExposure: 1.0,
           logarithmicDepthBuffer: true,
         }}
+        onCreated={handleCreated}
         style={{ background: "#FFFFFF" }}
       >
         {/* Lighting — bright gallery feel */}
