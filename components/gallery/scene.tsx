@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, Suspense } from "react";
+import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
@@ -75,7 +75,8 @@ function WallPainting({
   rotation: [number, number, number];
   onClick: () => void;
 }) {
-  const [texture, setTexture] = useState<THREE.Texture | null>(null);
+  const materialRef = useRef<THREE.MeshStandardMaterial>(null);
+  const [dims, setDims] = useState<{ aspect: number } | null>(null);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
@@ -90,22 +91,33 @@ function WallPainting({
         tex.generateMipmaps = true;
         tex.anisotropy = 16;
         tex.colorSpace = THREE.SRGBColorSpace;
-        setTexture(tex);
+        if (materialRef.current) {
+          materialRef.current.map = tex;
+          materialRef.current.needsUpdate = true;
+        }
+        const img = tex.image as HTMLImageElement;
+        if (img && img.width > 1) {
+          setDims({ aspect: img.width / img.height });
+        } else {
+          setDims({ aspect: 0.75 });
+        }
       },
       undefined,
       (err) => {
         if (cancelled) return;
         console.warn("Failed to load texture:", imageSrc, err);
-        setTexture(createFallbackTexture());
+        if (materialRef.current) {
+          materialRef.current.map = createFallbackTexture();
+          materialRef.current.needsUpdate = true;
+        }
         setFailed(true);
+        setDims({ aspect: 0.75 });
       }
     );
     return () => { cancelled = true; };
   }, [imageSrc]);
 
-  const displayTexture = texture;
-  const img = displayTexture?.image as HTMLImageElement | HTMLCanvasElement | undefined;
-  const aspect = img && "width" in img && img.width > 1 ? img.width / img.height : 0.75;
+  const aspect = dims?.aspect ?? 0.75;
 
   // Fit painting within max bounds — taller paintings get more height
   const maxW = 2.0;
@@ -132,8 +144,8 @@ function WallPainting({
       <mesh position={[0, 0, 0.02]} onClick={(e) => { e.stopPropagation(); onClick(); }}>
         <planeGeometry args={[pw, ph]} />
         <meshStandardMaterial
-          map={displayTexture}
-          color={failed ? "#3a3a3a" : undefined}
+          ref={materialRef}
+          color={failed ? "#3a3a3a" : "#1A1510"}
           roughness={0.7}
         />
       </mesh>
