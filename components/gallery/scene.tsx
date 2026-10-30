@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, Suspense } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
@@ -78,11 +78,13 @@ function WallPainting({
   const [texture, setTexture] = useState<THREE.Texture | null>(null);
   const [failed, setFailed] = useState(false);
 
-  useState(() => {
+  useEffect(() => {
+    let cancelled = false;
     const loader = new THREE.TextureLoader();
     loader.load(
       imageSrc,
       (tex) => {
+        if (cancelled) { tex.dispose(); return; }
         tex.minFilter = THREE.LinearMipmapLinearFilter;
         tex.magFilter = THREE.LinearFilter;
         tex.generateMipmaps = true;
@@ -92,12 +94,14 @@ function WallPainting({
       },
       undefined,
       (err) => {
+        if (cancelled) return;
         console.warn("Failed to load texture:", imageSrc, err);
         setTexture(createFallbackTexture());
         setFailed(true);
       }
     );
-  });
+    return () => { cancelled = true; };
+  }, [imageSrc]);
 
   const displayTexture = texture;
   const img = displayTexture?.image as HTMLImageElement | HTMLCanvasElement | undefined;
